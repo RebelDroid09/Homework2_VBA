@@ -1,5 +1,5 @@
 Attribute VB_Name = "Module1"
-Sub DataProcessing()
+Sub ProcessData()
     tickerCol = 9
     yearlyChangeCol = 10
     presentCharCol = 11
@@ -23,14 +23,14 @@ Sub DataProcessing()
         NumRows = ws.Range("A1", ws.Range("A1").End(xlDown)).Rows.Count
         firstPrice = 0#
         lastPrice = 0#
-        Dim volumeCount As Long
+        Dim volumeCount As Double
         tickerName = ""
         
         For iterator = 2 To NumRows
             currentDate = ws.Cells(iterator, 2)
             processedDate = Mid(currentDate, 5, 4)
 
-            volumeCount = ws.Cells(iterator, 7).Value
+            volumeCount = volumeCount + ws.Cells(iterator, 7).Value
             
             If processedDate = "0101" Or tickerName <> ws.Cells(iterator, 1).Value Then
                 firstPrice = ws.Cells(iterator, 3).Value
@@ -38,34 +38,37 @@ Sub DataProcessing()
             ElseIf processedDate = "1230" Then
                 lastPrice = ws.Cells(iterator, 6).Value
                 
-                Cells(tickerIterator, tickerCol) = tickerName
-                Cells(tickerIterator, yearlyChangeCol) = lastPrice - firstPrice
+                ws.Cells(tickerIterator, tickerCol) = tickerName
+                ws.Cells(tickerIterator, yearlyChangeCol) = lastPrice - firstPrice
                 
                 If (lastPrice - firstPrice) >= 0 Then
-                    Cells(tickerIterator, yearlyChangeCol).Interior.ColorIndex = 4
+                    ws.Cells(tickerIterator, yearlyChangeCol).Interior.ColorIndex = 4
                 Else
-                    Cells(tickerIterator, yearlyChangeCol).Interior.ColorIndex = 3
+                    ws.Cells(tickerIterator, yearlyChangeCol).Interior.ColorIndex = 3
                 End If
                 
                 If lastPrice = 0 And firstPrice = 0 Then
-                    Cells(tickerIterator, presentCharCol) = 0
+                    ws.Cells(tickerIterator, presentCharCol) = 0
                 ElseIf firstPrice = 0 Then
-                    Cells(tickerIterator, presentCharCol) = lastPrice
+                    ws.Cells(tickerIterator, presentCharCol) = lastPrice
                 Else
-                    Cells(tickerIterator, presentCharCol) = ((lastPrice - firstPrice) / firstPrice) * 100
+                    ws.Cells(tickerIterator, presentCharCol) = ((lastPrice - firstPrice) / firstPrice)
                 End If
                 
-                Cells(tickerIterator, totalStockVolCol) = volumeCount
-                Cells(tickerIterator, tickerCol) = tickerName
-                Cells(tickerIterator, presentCharCol).NumberFormat = "0.00%"
+                ws.Cells(tickerIterator, totalStockVolCol) = volumeCount
+                ws.Cells(tickerIterator, tickerCol) = tickerName
+                ws.Cells(tickerIterator, presentCharCol).NumberFormat = "0.00%"
                 
                 firstPrice = 0#
                 lastPrice = 0#
-                volumeCount = 0
                 tickerName = ""
+                volumeCount = 0
                 
                 tickerIterator = tickerIterator + 1
             End If
         Next
+        
+        tickerIterator = 2
     Next
 End Sub
+
